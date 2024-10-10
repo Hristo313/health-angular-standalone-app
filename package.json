@@ -4,7 +4,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve -o",
-    "build": "ng build",
+    "build": "ng build --base-href https://Hristo313.github.io/health-angular-standalone-app/",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "lint": "ng lint",
