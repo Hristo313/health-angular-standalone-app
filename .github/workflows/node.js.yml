@@ -43,6 +43,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+    - name: Set project name
+      run: echo "PROJECT_NAME=$(jq -r '.name' package.json)" >> $GITHUB_ENV
     - run: echo "@infragistics:registry=https://packages.infragistics.com/npm/js-licensed/" >> ~/.npmrc
     - run: echo "//packages.infragistics.com/npm/js-licensed/:_auth=${{ secrets.NPM_AUTH_TOKEN }}" >> ~/.npmrc
     - run: echo "//packages.infragistics.com/npm/js-licensed/:always-auth=true" >> ~/.npmrc
@@ -53,4 +55,4 @@ jobs:
       if: github.ref == 'refs/heads/main'
       with:
         github_token: ${{ secrets.MY_GITHUB_TOKEN }}
-        publish_dir: ./dist/${{ github.event.repository.name }}/browser
+        publish_dir: ./dist/${{ env.PROJECT_NAME }}/browser
