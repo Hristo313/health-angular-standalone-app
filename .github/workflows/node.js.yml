@@ -53,4 +53,4 @@ jobs:
       if: github.ref == 'refs/heads/main'
       with:
         github_token: ${{ secrets.MY_GITHUB_TOKEN }}
-        publish_dir: ./dist/health-vault/browser
+        publish_dir: ./dist/${{ github.event.repository.name }}/browser
