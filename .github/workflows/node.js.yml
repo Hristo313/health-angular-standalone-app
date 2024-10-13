@@ -52,8 +52,7 @@ jobs:
     - name: Build project with dynamic base-href
       run: npm run build -- --base-href "https://${{ github.actor }}.github.io/${{ github.event.repository.name }}/"
     - name: Update Resource Paths
-      run: |
-        find ./dist/${{ env.PROJECT_NAME }}/browser -type f -name '*main*.js' -exec sed -i -e "s|/assets|/${{ github.event.repository.name }}/assets|g" -e "s|url('/assets|url('/${{ github.event.repository.name }}/assets|g" {} +
+      run: find ./dist/${{ env.PROJECT_NAME }}/browser -type f -name '*main*.js' -exec sed -i -e "s|/assets|/${{ github.event.repository.name }}/assets|g" -e "s|url('/assets|url('/${{ github.event.repository.name }}/assets|g" {} +
     - name: github-pages
       uses: peaceiris/actions-gh-pages@v3
       if: github.ref == 'refs/heads/main'
