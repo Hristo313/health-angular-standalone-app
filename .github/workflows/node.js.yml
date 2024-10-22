@@ -52,10 +52,10 @@ jobs:
     - name: Determine if project is standalone
       id: determine-standalone
       run: |
-        if jq -e '.projects | to_entries[] | .value.architect.build.options.standalone == true' angular.json > /dev/null; then
-          echo "IS_STANDALONE=true" >> $GITHUB_ENV
-        else
+        if jq -e '.projects | to_entries[] | .value.architect.build.options.standalone == false" angular.json > /dev/null; then
           echo "IS_STANDALONE=false" >> $GITHUB_ENV
+        else
+          echo "IS_STANDALONE=true" >> $GITHUB_ENV
         fi
     - name: Set build path based on standalone
       run: |
