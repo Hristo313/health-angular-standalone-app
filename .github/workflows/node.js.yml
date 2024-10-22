@@ -49,20 +49,12 @@ jobs:
     - run: echo "//packages.infragistics.com/npm/js-licensed/:_auth=${{ secrets.NPM_AUTH_TOKEN }}" >> ~/.npmrc
     - run: echo "//packages.infragistics.com/npm/js-licensed/:always-auth=true" >> ~/.npmrc
     - run: npm i
-    - name: Determine if project is standalone
-      id: determine-standalone
+    - name: Determine if project is standalone and set build path
       run: |
-        if jq -e '.projects | to_entries[] | .value.architect.build.options.standalone == false' angular.json > /dev/null; then
-          echo "IS_STANDALONE=false" >> $GITHUB_ENV
-        else
-          echo "IS_STANDALONE=true" >> $GITHUB_ENV
-        fi
-    - name: Set build path based on standalone
-      run: |
-        if [ "${{ env.IS_STANDALONE }}" = "true" ]; then
-          echo "BUILD_PATH=./dist/${{ env.PROJECT_NAME }}/browser" >> $GITHUB_ENV
-        else
+        if jq -e ".projects[\"${{ env.PROJECT_NAME }}\"].schematics[\"@schematics/angular:application\"].standalone == false" angular.json > /dev/null; then
           echo "BUILD_PATH=./dist/${{ env.PROJECT_NAME }}" >> $GITHUB_ENV
+        else
+          echo "BUILD_PATH=./dist/${{ env.PROJECT_NAME }}/browser" >> $GITHUB_ENV
         fi
     - name: Build project with dynamic base-href
       run: npm run build -- --base-href "https://${{ github.actor }}.github.io/${{ github.event.repository.name }}/"
