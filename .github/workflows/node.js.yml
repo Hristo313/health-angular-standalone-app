@@ -49,13 +49,28 @@ jobs:
     - run: echo "//packages.infragistics.com/npm/js-licensed/:_auth=${{ secrets.NPM_AUTH_TOKEN }}" >> ~/.npmrc
     - run: echo "//packages.infragistics.com/npm/js-licensed/:always-auth=true" >> ~/.npmrc
     - run: npm i
+    - name: Determine if project is standalone
+      id: determine-standalone
+      run: |
+        if jq -e '.projects | to_entries[] | .value.architect.build.options.standalone == true' angular.json > /dev/null; then
+          echo "IS_STANDALONE=true" >> $GITHUB_ENV
+        else
+          echo "IS_STANDALONE=false" >> $GITHUB_ENV
+        fi
+    - name: Set build path based on standalone
+      run: |
+        if [ "${{ env.IS_STANDALONE }}" = "true" ]; then
+          echo "BUILD_PATH=./dist/${{ env.PROJECT_NAME }}/browser" >> $GITHUB_ENV
+        else
+          echo "BUILD_PATH=./dist/${{ env.PROJECT_NAME }}" >> $GITHUB_ENV
+        fi
     - name: Build project with dynamic base-href
       run: npm run build -- --base-href "https://${{ github.actor }}.github.io/${{ github.event.repository.name }}/"
     - name: Update Resource Paths
-      run: find ./dist/${{ env.PROJECT_NAME }}/browser -type f -name '*main*.js' -exec sed -i -e "s|/assets|/${{ github.event.repository.name }}/assets|g" -e "s|url('/assets|url('/${{ github.event.repository.name }}/assets|g" {} +
+      run: find ${{ env.BUILD_PATH }} -type f -name '*main*.js' -exec sed -i -e "s|/assets|/${{ github.event.repository.name }}/assets|g" -e "s|url('/assets|url('/${{ github.event.repository.name }}/assets|g" {} +
     - name: github-pages
       uses: peaceiris/actions-gh-pages@v3
       if: github.ref == 'refs/heads/main'
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./dist/${{ env.PROJECT_NAME }}/browser
+        publish_dir: ${{ env.BUILD_PATH }}
